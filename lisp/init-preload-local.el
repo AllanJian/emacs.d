@@ -17,6 +17,8 @@
 (add-to-list 'auto-mode-alist '("\\.wxml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.wxss\\'" . css-mode))
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
+(add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
+
 ;; rjsx缩进
 (defadvice js-jsx-indent-line (after js-jsx-indent-line-after-hack activate)
    "Workaround sgml-mode and follow airbnb component style."
@@ -49,10 +51,16 @@
 
 (require 'web-mode)
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
 (add-hook 'web-mode-hook
           (lambda ()
             (when (string-equal "tsx" (file-name-extension buffer-file-name))
               (setup-tide-mode))))
+(add-hook 'web-mode-hook
+          (lambda ()
+            (when (string-equal "ts" (file-name-extension buffer-file-name))
+              (setup-tide-mode))))
+
 
 
 
@@ -129,7 +137,7 @@
     '(progn
       (set-face-attribute 'flycheck-error nil :foreground "yellow" :background "red")))
 
-(add-hook 'focus-out-hook 'save-buffer)
+;;(add-hook 'focus-out-hook 'save-buffer)
 
 ;;start 设置剪切板共享  GUI版本不需要
 ;;(defun copy-from-osx () 
