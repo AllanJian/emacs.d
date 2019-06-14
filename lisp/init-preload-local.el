@@ -16,8 +16,8 @@
 (add-to-list 'auto-mode-alist '("\\.jsx\\'" . rjsx-mode))
 (add-to-list 'auto-mode-alist '("\\.wxml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.wxss\\'" . css-mode))
-(add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
-(add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
+(add-to-list 'auto-mode-alist '("\\.tsx\\'" . rjsx-mode))
+(add-to-list 'auto-mode-alist '("\\.ts\\'" . rjsx-mode))
 
 ;; rjsx缩进
 (defadvice js-jsx-indent-line (after js-jsx-indent-line-after-hack activate)
@@ -48,10 +48,8 @@
 (add-hook 'before-save-hook 'tide-format-before-save)
 
 (add-hook 'typescript-mode-hook #'setup-tide-mode)
-
+(add-hook 'rjsx-mode-hook #'setup-tide-mode)
 (require 'web-mode)
-(add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
 (add-hook 'web-mode-hook
           (lambda ()
             (when (string-equal "tsx" (file-name-extension buffer-file-name))
@@ -59,6 +57,14 @@
 (add-hook 'web-mode-hook
           (lambda ()
             (when (string-equal "ts" (file-name-extension buffer-file-name))
+              (setup-tide-mode))))
+(add-hook 'rjsx-mode-hook
+          (lambda ()
+            (when (string-equal "jsx" (file-name-extension buffer-file-name))
+              (setup-tide-mode))))
+(add-hook 'rjsx-mode-hook
+          (lambda ()
+            (when (string-equal "js" (file-name-extension buffer-file-name))
               (setup-tide-mode))))
 
 
@@ -130,9 +136,10 @@
   (flycheck-add-mode 'javascript-eslint 'rjsx-mode)
   (flycheck-add-mode 'javascript-eslint 'typescript-mode))
   ;; configure jsx-tide checker to run after your default jsx checker
-  ;;(flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
+  (flycheck-add-next-checker 'javascript-eslint 'typescript-tslint 'append)
   ;; enable typescript-tslint checker
-  ;;(flycheck-add-mode 'typescript-tslint 'web-mode)
+  (flycheck-add-mode 'typescript-tslint 'web-mode)
+  ;;(flycheck-add-mode 'typescript-tslint 'rjsx-mode)
 (eval-after-load 'flycheck
     '(progn
       (set-face-attribute 'flycheck-error nil :foreground "yellow" :background "red")))
@@ -152,7 +159,6 @@
 ;;end 设置剪切板共享 
 
 ;; 中英文对齐 begin
-
 (defun create-frame-font-mac()          ;emacs 若直接启动 启动时调用此函数似乎无效
   (set-face-attribute
    'default nil :font "Menlo 12")
@@ -161,18 +167,15 @@
     (set-fontset-font (frame-parameter nil 'font)
                       charset
                       (font-spec :family "PingFang SC" :size 14)))
-
   (set-fontset-font (frame-parameter nil 'font)
                     'kana                 ;script ｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺ
                     (font-spec :family "Hiragino Sans" :size 14))
   (set-fontset-font (frame-parameter nil 'font)
                     'hangul               ;script 까까까까까까까까까까까까까까까까까까까까
                     (font-spec :family "Apple SD Gothic Neo" :size 16))
-
   )
 (when (and (equal system-type 'darwin) (window-system))
   (add-hook 'after-init-hook 'create-frame-font-mac))
-
 (defun create-frame-font-w32()          ;emacs 若直接启动 启动时调用此函数似乎无效
   (set-face-attribute
    'default nil :font "Courier New 10")
@@ -181,18 +184,14 @@
     (set-fontset-font (frame-parameter nil 'font)
                       charset
                       (font-spec :family "新宋体" :size 16)))
-
   (set-fontset-font (frame-parameter nil 'font)
                     'kana                 ;script ｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺ
                     (font-spec :family "MS Mincho" :size 16))
   (set-fontset-font (frame-parameter nil 'font)
                     'hangul               ;script 까까까까까까까까까까까까까까까까까까까까
                     (font-spec :family "GulimChe" :size 16)))
-
 (when (and (equal system-type 'windows-nt) (window-system))
   (add-hook 'after-init-hook 'create-frame-font-w32))
-
-
 (defun  emacs-daemon-after-make-frame-hook(&optional f) ;emacsclient 打开的窗口相关的设置
   ;; (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
   ;; (when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
@@ -206,7 +205,6 @@
       ;; (set-frame-parameter f 'alpha 85)
       ;; (raise-frame)
       )))
-
 (add-hook 'after-make-frame-functions 'emacs-daemon-after-make-frame-hook)
 ;; 中英文对齐 end
 
