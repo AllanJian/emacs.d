@@ -66,7 +66,14 @@
           (lambda ()
             (when (string-equal "js" (file-name-extension buffer-file-name))
               (setup-tide-mode))))
-
+(add-hook 'rjsx-mode-hook
+          (lambda ()
+            (when (string-equal "tsx" (file-name-extension buffer-file-name))
+              (setup-tide-mode))))
+(add-hook 'rjsx-mode-hook
+          (lambda ()
+            (when (string-equal "ts" (file-name-extension buffer-file-name))
+              (setup-tide-mode))))
 
 
 
@@ -133,13 +140,15 @@
   ;; disable jshint since we prefer eslint checking
   (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(javascript-jshint)))
   ;; use eslint with rjsx-mode for jsx files
-  (flycheck-add-mode 'javascript-eslint 'rjsx-mode)
-  (flycheck-add-mode 'javascript-eslint 'typescript-mode))
-  ;; configure jsx-tide checker to run after your default jsx checker
-  (flycheck-add-next-checker 'javascript-eslint 'typescript-tslint 'append)
-  ;; enable typescript-tslint checker
+  ;;(flycheck-add-mode 'javascript-eslint 'rjsx-mode)
+  ;;(flycheck-add-mode 'javascript-eslint 'typescript-mode)
   (flycheck-add-mode 'typescript-tslint 'web-mode)
-  ;;(flycheck-add-mode 'typescript-tslint 'rjsx-mode)
+  (flycheck-add-mode 'typescript-tslint 'rjsx-mode)
+  )
+  ;; configure jsx-tide checker to run after your default jsx checker
+  ;;(flycheck-add-next-checker 'javascript-eslint 'typescript-tslint 'append)
+  ;; enable typescript-tslint checker
+  
 (eval-after-load 'flycheck
     '(progn
       (set-face-attribute 'flycheck-error nil :foreground "yellow" :background "red")))
