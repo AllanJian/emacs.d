@@ -17,7 +17,7 @@
 (add-to-list 'auto-mode-alist '("\\.wxml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.wxss\\'" . css-mode))
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . rjsx-mode))
-(add-to-list 'auto-mode-alist '("\\.ts\\'" . rjsx-mode))
+(add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
 
 ;; rjsx缩进
 (defadvice js-jsx-indent-line (after js-jsx-indent-line-after-hack activate)
@@ -33,7 +33,7 @@
   (interactive)
   (tide-setup)
   (flycheck-mode +1)
-  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  ;;(setq flycheck-check-syntax-automatically '(save mode-enabled))
   (eldoc-mode +1)
   (tide-hl-identifier-mode +1)
   ;; company is an optional dependency. You have to
@@ -47,7 +47,7 @@
 ;; formats the buffer before saving
 (add-hook 'before-save-hook 'tide-format-before-save)
 
-(add-hook 'typescript-mode-hook #'setup-tide-mode)
+(add-hook 'web-mode-hook #'setup-tide-mode)
 (add-hook 'rjsx-mode-hook #'setup-tide-mode)
 (require 'web-mode)
 (add-hook 'web-mode-hook
@@ -70,7 +70,7 @@
           (lambda ()
             (when (string-equal "tsx" (file-name-extension buffer-file-name))
               (setup-tide-mode))))
-(add-hook 'rjsx-mode-hook
+(add-hook 'web-mode-hook
           (lambda ()
             (when (string-equal "ts" (file-name-extension buffer-file-name))
               (setup-tide-mode))))
@@ -78,7 +78,6 @@
 
 
 (add-hook 'rjsx-mode-hook 'hs-minor-mode)
-(add-hook 'rjsx-mode-hook #'setup-tide-mode)
 (add-hook 'rjsx-mode-hook 'emmet-mode)
 (add-hook 'web-mode-hook 'emmet-mode)
 (add-hook 'rjsx-mode-hook 'git-gutter-mode)
@@ -140,13 +139,13 @@
   ;; disable jshint since we prefer eslint checking
   (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(javascript-jshint)))
   ;; use eslint with rjsx-mode for jsx files
-  ;;(flycheck-add-mode 'javascript-eslint 'rjsx-mode)
+  (flycheck-add-mode 'javascript-eslint 'rjsx-mode)
   ;;(flycheck-add-mode 'javascript-eslint 'typescript-mode)
   (flycheck-add-mode 'typescript-tslint 'web-mode)
-  (flycheck-add-mode 'typescript-tslint 'rjsx-mode)
+  ;;(flycheck-add-mode 'typescript-tslint 'rjsx-mode)
   )
   ;; configure jsx-tide checker to run after your default jsx checker
-  ;;(flycheck-add-next-checker 'javascript-eslint 'typescript-tslint 'append)
+  (flycheck-add-next-checker 'javascript-eslint 'typescript-tslint 'append)
   ;; enable typescript-tslint checker
   
 (eval-after-load 'flycheck
