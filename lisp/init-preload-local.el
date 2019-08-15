@@ -66,7 +66,6 @@
 (add-hook 'web-mode-hook
           (lambda ()
             (when (string-equal "jsx" (file-name-extension buffer-file-name))
-            ;;(flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
               (setup-tide-mode)
               )))
 (add-hook 'web-mode-hook
@@ -109,6 +108,7 @@
   (setq emmet-expand-jsx-className? t)
   (setq web-mode-markup-indent-offset 2)
   (setq web-mode-css-indent-offset 2)
+  (setq web-mode-enable-auto-indentation nil)
   (setq web-mode-comment-style 2)
   (flycheck-select-checker 'javascript-eslint)
   (setq web-mode-enable-current-element-highlight t)
@@ -174,7 +174,6 @@
   (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(typescript-tslint)))
   ;; use eslint with web-mode for jsx files
   (flycheck-add-mode 'javascript-eslint 'web-mode)
-  (flycheck-add-next-checker 'javascript-eslint 'tsx-tide 'append)
   ;; Workaround for eslint loading slow
   ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
   (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t)))
