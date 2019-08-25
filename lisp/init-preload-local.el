@@ -15,7 +15,7 @@
              '("melpa" . "https://melpa.org/packages/") t)
 
 
-(require 'tide)
+;;(require 'tide)
 
 
 ;; 安装资源路径
