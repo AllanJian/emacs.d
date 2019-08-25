@@ -1,11 +1,20 @@
 ;;; 本地配置
 
+(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+
+
 ;;(global-linum-mode 1)
 (require 'git-gutter)
 (require 'eslint-fix)
 (require 'emmet-mode)
 (global-git-gutter-mode +1)
 (display-time-mode 1)
+
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/") t)
+
+
 (require 'tide)
 
 
