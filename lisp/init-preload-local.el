@@ -15,7 +15,9 @@
              '("melpa" . "https://melpa.org/packages/") t)
 
 
-;;(require 'tide)
+(require 'tide)
+(flycheck-add-next-checker 'tsx-tide '(warning . javascript-eslint) 'append)
+(flycheck-add-next-checker 'jsx-tide '(warning . javascript-eslint) 'append)
 
 
 ;; 安装资源路径
@@ -71,21 +73,23 @@
           (lambda ()
             (when (string-equal "tsx" (file-name-extension buffer-file-name))
               (setup-tide-mode)
+              (flycheck-select-checker 'tsx-tide)
               )))
 (add-hook 'web-mode-hook
           (lambda ()
             (when (string-equal "jsx" (file-name-extension buffer-file-name))
               (setup-tide-mode)
+              (flycheck-select-checker 'jsx-tide)
               )))
 (add-hook 'web-mode-hook
           (lambda ()
             (when (string-equal "js" (file-name-extension buffer-file-name))
-              ;;(setup-tide-mode)
+              (setup-tide-mode)
               )))
 (add-hook 'web-mode-hook
           (lambda ()
             (when (string-equal "ts" (file-name-extension buffer-file-name))
-              ;;(setup-tide-mode)
+              (setup-tide-mode)
               )))
 
 
