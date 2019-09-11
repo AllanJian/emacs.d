@@ -16,8 +16,9 @@
 
 
 (require 'tide)
-(flycheck-add-next-checker 'tsx-tide '(warning . javascript-eslint) 'append)
-(flycheck-add-next-checker 'jsx-tide '(warning . javascript-eslint) 'append)
+(load-theme 'sanityinc-solarized-dark t)
+(flycheck-add-next-checker 'tsx-tide 'javascript-eslint)
+;;(flycheck-add-next-checker 'jsx-tide 'javascript-eslint 'append)
 
 
 ;; 安装资源路径
@@ -79,7 +80,6 @@
           (lambda ()
             (when (string-equal "jsx" (file-name-extension buffer-file-name))
               (setup-tide-mode)
-              (flycheck-select-checker 'jsx-tide)
               )))
 (add-hook 'web-mode-hook
           (lambda ()
@@ -197,31 +197,85 @@
 (add-hook 'focus-out-hook 'save-buffer)
 
 
+;; 中英文对齐 begin
+
+(defun create-frame-font-mac()          ;emacs 若直接启动 启动时调用此函数似乎无效
+  (set-face-attribute
+   'default nil :font "Menlo 12")
+  ;; Chinese Font
+  (dolist (charset '( han symbol cjk-misc bopomofo)) ;script 可以通过C-uC-x=查看当前光标下的字的信息
+    (set-fontset-font (frame-parameter nil 'font)
+                      charset
+                      (font-spec :family "PingFang SC" :size 14)))
+
+  (set-fontset-font (frame-parameter nil 'font)
+                    'kana                 ;script ｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺ
+                    (font-spec :family "Hiragino Sans" :size 14))
+  (set-fontset-font (frame-parameter nil 'font)
+                    'hangul               ;script 까까까까까까까까까까까까까까까까까까까까
+                    (font-spec :family "Apple SD Gothic Neo" :size 16))
+
+  )
+(when (and (equal system-type 'darwin) (window-system))
+  (add-hook 'after-init-hook 'create-frame-font-mac))
+
+(defun create-frame-font-w32()          ;emacs 若直接启动 启动时调用此函数似乎无效
+  (set-face-attribute
+   'default nil :font "Courier New 10")
+  ;; Chinese Font
+  (dolist (charset '( han symbol cjk-misc bopomofo)) ;script 可以通过C-uC-x=查看当前光标下的字的信息
+    (set-fontset-font (frame-parameter nil 'font)
+                      charset
+                      (font-spec :family "新宋体" :size 16)))
+
+  (set-fontset-font (frame-parameter nil 'font)
+                    'kana                 ;script ｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺ
+                    (font-spec :family "MS Mincho" :size 16))
+  (set-fontset-font (frame-parameter nil 'font)
+                    'hangul               ;script 까까까까까까까까까까까까까까까까까까까까
+                    (font-spec :family "GulimChe" :size 16)))
+
+(when (and (equal system-type 'windows-nt) (window-system))
+  (add-hook 'after-init-hook 'create-frame-font-w32))
+
+
+(defun  emacs-daemon-after-make-frame-hook(&optional f) ;emacsclient 打开的窗口相关的设置
+  ;; (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+  ;; (when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+  ;; (when (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+  (with-selected-frame f
+    (when (window-system)
+      (when (equal system-type 'darwin) (create-frame-font-mac))
+      (when (equal system-type 'windows-nt) (create-frame-font-w32))
+      ;; (set-frame-position f 160 80)
+      ;; (set-frame-size f 140 50)
+      ;; (set-frame-parameter f 'alpha 85)
+      ;; (raise-frame)
+      )))
+
+(add-hook 'after-make-frame-functions 'emacs-daemon-after-make-frame-hook)
+;; 中英文对齐 end
 
 ;;start 设置剪切板共享  GUI版本不需要 ------------------------------------
-;;(defun copy-from-osx () 
-;;(shell-command-to-string "pbpaste")) 
-;;(defun paste-to-osx (text &optional push) 
-;;(let ((process-connection-type nil)) 
-;;(let ((proc (start-process"pbcopy" "*Messages*" "pbcopy"))) 
-;;(process-send-string proc text) 
-;;(process-send-eof proc)))) 
-;;(setq interprogram-cut-function 'paste-to-osx) 
-;;(setq interprogram-paste-function 'copy-from-osx) 
+;;(defun copy-from-osx ()
+;;(shell-command-to-string "pbpaste"))
+;;(defun paste-to-osx (text &optional push)
+;;(let ((process-connection-type nil))
+;;(let ((proc (start-process"pbcopy" "*Messages*" "pbcopy")))
+;;(process-send-string proc text)
+;;(process-send-eof proc))))
+;;(setq interprogram-cut-function 'paste-to-osx)
+;;(setq interprogram-paste-function 'copy-from-osx)
 ;;end 设置剪切板共享 ====================================================
 
-;; 中英文对齐 begin ----------------------------------------------------
-
-;; 中英文对齐 end =================================================
-
 ;; markdown 预览 ------------------------------------------
-(add-hook 'markdown-mode-hook 'vmd-mode) ;; or add a hook...
+;; (add-hook 'markdown-mode-hook 'vmd-mode) ;; or add a hook...
 ;; ===================================================
 
 ;; desktop-save-mode ----------------------------------------------------
-(desktop-save-mode t)
-(setq desktop-restore-eager 5)
-(setq desktop-lazy-verbose t)
+;;(desktop-save-mode t)
+;;(setq desktop-restore-eager 5)
+;;(setq desktop-lazy-verbose t)
 ;; end desktop-save-mode ===================================================
 
 ;; eshell 中文乱码 ----------------------------------------------------

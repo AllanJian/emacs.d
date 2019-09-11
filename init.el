@@ -185,3 +185,4 @@
 ;; no-byte-compile: t
 ;; End:
 ;;; init.el ends here
+(put 'set-goal-column 'disabled nil)
