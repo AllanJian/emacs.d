@@ -5,6 +5,7 @@
 ;; a number of other files.
 
 ;;; Code:
+(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 
 ;; Produce backtraces when errors occur
 (setq debug-on-error t)
