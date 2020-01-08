@@ -333,11 +333,22 @@ With arg N, insert N newlines."
 (add-hook 'after-init-hook 'hes-mode)
 
 
-(require-package 'guide-key)
-(setq guide-key/guide-key-sequence t)
-(add-hook 'after-init-hook 'guide-key-mode)
-(after-load 'guide-key
-  (diminish 'guide-key-mode))
+(require-package 'which-key)
+(add-hook 'after-init-hook 'which-key-mode)
+(setq-default which-key-idle-delay 1.5)
+(after-load 'which-key
+  (diminish 'which-key-mode))
+
+
+(defun sanityinc/disable-features-during-macro-call (orig &rest args)
+  "When running a macro, disable features that might be expensive.
+ORIG is the advised function, which is called with its ARGS."
+  (let (post-command-hook
+        font-lock-mode
+        (tab-always-indent (or (eq 'complete tab-always-indent) tab-always-indent)))
+    (apply orig args)))
+
+(advice-add 'kmacro-call-macro :around 'sanityinc/disable-features-during-macro-call)
 
 
 (defun sanityinc/disable-features-during-macro-call (orig &rest args)
