@@ -1,7 +1,36 @@
-;;; 本地配置
+;;; init-preload-local.el --- 本地配置
+;;; 安装资源路径
+(setq package-archives '(
+                         ("melpa" . "https://elpa.emacs-china.org/melpa/")
+                         ("gnu"   . "https://elpa.emacs-china.org/gnu/")
+                         ))
+;;;;;;;;;;;;;;
+;; cl - Common Lisp Extension
+(require 'cl)
 
+;; Add Packages
+(defvar my/packages '(
+                      tide
+                      monokai-theme
+                      ) "Default packages")
+
+(setq package-selected-packages my/packages)
+
+(defun my/packages-installed-p ()
+  (loop for pkg in my/packages
+        when (not (package-installed-p pkg)) do (return nil)
+        finally (return t)))
+
+(unless (my/packages-installed-p)
+  (message "%s" "Refreshing package database...")
+  (package-refresh-contents)
+  (dolist (pkg my/packages)
+    (when (not (package-installed-p pkg))
+      (package-install pkg))))
+;;;;;;;;;; 安装必要的东西
+(global-hl-line-mode 1) ;; 光标所在行高亮
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
-
+(setq make-backup-files nil)
 
 ;;(global-linum-mode 1)
 (require 'git-gutter)
@@ -11,8 +40,9 @@
 (display-time-mode 1)
 
 (require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/") t)
+
+;; (add-to-list 'package-archives
+;;              '("melpa" . "https://melpa.org/packages/") t)
 
 
 (require 'tide)
@@ -20,14 +50,7 @@
 (flycheck-add-next-checker 'tsx-tide 'javascript-eslint)
 ;;(flycheck-add-next-checker 'jsx-tide 'javascript-eslint 'append)
 
-
-;; 安装资源路径
-(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-             ("marmalade" . "http://marmalade-repo.org/packages/")
-             ("melpa" . "http://melpa.milkbox.net/packages/")))
-
-;;;;;;;;;;;;;;
-;rjsx-mode
+                                        ;rjsx-mode
 ;;;;;;;;;;;;;;;
 (require 'js2-mode)
 (require 'rjsx-mode)
@@ -37,18 +60,23 @@
 (add-to-list 'auto-mode-alist '("\\.wxml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.wxss\\'" . css-mode))
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
+(add-to-list 'auto-mode-alist '("\\.json\\'" . web-mode))
 
 ;; rjsx缩进
 (defadvice js-jsx-indent-line (after js-jsx-indent-line-after-hack activate)
-   "Workaround sgml-mode and follow airbnb component style."
-   (save-excursion
+  "Workaround sgml-mode and follow airbnb component style."
+  (save-excursion
     (beginning-of-line)
     (if (looking-at-p "^ +\/?> *$")
-      (delete-char sgml-basic-offset))
-))
+        (delete-char sgml-basic-offset))
+    ))
+;; 自动补全插件
+;; (use-package company-tabnine :ensure t)
+;; (add-to-list 'company-backends #'company-tabnine)
+;; 自动补全插件 ends
 
-;; typescript ;;;
+;; tide ;;;
 (defun setup-tide-mode ()
   (interactive)
   (tide-setup)
@@ -59,16 +87,20 @@
   ;; company is an optional dependency. You have to
   ;; install it separately via package-install
   ;; `M-x package-install [ret] company`
-  (company-mode +1))
+  (company-mode +1)
+  (setq company-backends
+        (remove 'company-css company-backends))  )
 
 ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
 
 ;; formats the buffer before saving
-(add-hook 'before-save-hook 'tide-format-before-save)
+;;(add-hook 'after-save-hook 'tide-format)
 
 (add-hook 'web-mode-hook #'setup-tide-mode)
 (add-hook 'rjsx-mode-hook #'setup-tide-mode)
+(add-hook 'typescript-mode-hook #'setup-tide-mode)
+
 (require 'web-mode)
 (add-hook 'web-mode-hook
           (lambda ()
@@ -86,11 +118,12 @@
             (when (string-equal "js" (file-name-extension buffer-file-name))
               (setup-tide-mode)
               )))
-(add-hook 'web-mode-hook
-          (lambda ()
-            (when (string-equal "ts" (file-name-extension buffer-file-name))
-              (setup-tide-mode)
-              )))
+;; (add-hook 'web-mode-hook
+;;           (lambda ()
+;;             (when (string-equal "ts" (file-name-extension buffer-file-name))
+;;               (setup-tide-mode)
+;;               (flycheck-select-checker 'javascript-eslint)
+;;               )))
 
 
 
@@ -99,9 +132,9 @@
 (add-hook 'web-mode-hook 'emmet-mode)
 (add-hook 'rjsx-mode-hook 'git-gutter-mode)
 (add-hook 'web-mode-hook 'git-gutter-mode)
-(add-to-list 'load-path "~/.emacs.d/lisp/elpa-mirror")
-(require 'elpa-mirror)
-(setq package-archives '(("myelpa" . "~/myelpa/")))
+;;(add-to-list 'load-path "~/.emacs.d/lisp/elpa-mirror")
+;;(require 'elpa-mirror)
+;;(setq package-archives '(("myelpa" . "~/myelpa/")))
 (setq company-dabbrev-downcase nil)
 (add-hook 'less-css-mode-hook
           (lambda ()
@@ -168,23 +201,22 @@
     '(add-hook 'rjsx-mode-hook 'add-node-modules-path))
   (eval-after-load 'web-mode
     '(add-hook 'web-mode-hook 'add-node-modules-path))
-)
+  )
 ;; end node_modules ======================================
-
 
 ;; flycheck ----------------------------------------------------
 (use-package flycheck
   :ensure t
   :custom
   (flycheck-display-errors-delay 0)
-  (flycheck-check-syntax-automatically '(mode-enabled save))
+  (flycheck-check-syntax-automatically '(mode-enabled save new-line))
   :config
   (global-flycheck-mode)
   ;; disable json-jsonlist checking for json files
   (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(json-jsonlist)))
   ;; disable jshint since we prefer eslint checking
   (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(javascript-jshint)))
-  (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(typescript-tslint)))
+  ;; (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(typescript-tslint)))
   ;; use eslint with web-mode for jsx files
   (flycheck-add-mode 'javascript-eslint 'web-mode)
   ;; Workaround for eslint loading slow
@@ -194,7 +226,7 @@
 ;; end flycheck ================================================================
 
 
-(add-hook 'focus-out-hook 'save-buffer)
+;;(add-hook 'focus-out-hook 'save-buffer)
 
 
 ;; 中英文对齐 begin
@@ -218,26 +250,6 @@
   )
 (when (and (equal system-type 'darwin) (window-system))
   (add-hook 'after-init-hook 'create-frame-font-mac))
-
-(defun create-frame-font-w32()          ;emacs 若直接启动 启动时调用此函数似乎无效
-  (set-face-attribute
-   'default nil :font "Courier New 10")
-  ;; Chinese Font
-  (dolist (charset '( han symbol cjk-misc bopomofo)) ;script 可以通过C-uC-x=查看当前光标下的字的信息
-    (set-fontset-font (frame-parameter nil 'font)
-                      charset
-                      (font-spec :family "新宋体" :size 16)))
-
-  (set-fontset-font (frame-parameter nil 'font)
-                    'kana                 ;script ｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺｺ
-                    (font-spec :family "MS Mincho" :size 16))
-  (set-fontset-font (frame-parameter nil 'font)
-                    'hangul               ;script 까까까까까까까까까까까까까까까까까까까까
-                    (font-spec :family "GulimChe" :size 16)))
-
-(when (and (equal system-type 'windows-nt) (window-system))
-  (add-hook 'after-init-hook 'create-frame-font-w32))
-
 
 (defun  emacs-daemon-after-make-frame-hook(&optional f) ;emacsclient 打开的窗口相关的设置
   ;; (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
@@ -273,7 +285,7 @@
 ;; ===================================================
 
 ;; desktop-save-mode ----------------------------------------------------
-;;(desktop-save-mode t)
+;;(desktop-save-mode nil)
 ;;(setq desktop-restore-eager 5)
 ;;(setq desktop-lazy-verbose t)
 ;; end desktop-save-mode ===================================================
@@ -282,6 +294,7 @@
 ;;(autoload 'ansi-color-for-comint-mode-on "ansi-color" nil t)
 ;;(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 ;; end eshell 中文乱码 =================================================
+
 
 (provide 'init-preload-local)
 ;;; init-preload-local.el ends here
