@@ -52,15 +52,15 @@
 
                                         ;rjsx-mode
 ;;;;;;;;;;;;;;;
-(require 'js2-mode)
-(require 'rjsx-mode)
+;; (require 'js2-mode)
+;; (require 'rjsx-mode)
 (add-to-list 'auto-mode-alist '("\\.html\\'" . html-mode))
 (add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.wxml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.wxss\\'" . css-mode))
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
+(add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.json\\'" . web-mode))
 
 ;; rjsx缩进
@@ -98,15 +98,16 @@
 ;;(add-hook 'after-save-hook 'tide-format)
 
 (add-hook 'web-mode-hook #'setup-tide-mode)
-(add-hook 'rjsx-mode-hook #'setup-tide-mode)
-(add-hook 'typescript-mode-hook #'setup-tide-mode)
+;;(add-hook 'rjsx-mode-hook #'setup-tide-mode)
+;;(add-hook 'typescript-mode-hook #'setup-tide-mode)
 
 (require 'web-mode)
 (add-hook 'web-mode-hook
           (lambda ()
             (when (string-equal "tsx" (file-name-extension buffer-file-name))
               (setup-tide-mode)
-              (flycheck-select-checker 'tsx-tide)
+              (flycheck-select-checker 'javascript-eslint)
+              ;;(flycheck-select-checker 'tsx-tide)
               )))
 (add-hook 'web-mode-hook
           (lambda ()
@@ -118,19 +119,19 @@
             (when (string-equal "js" (file-name-extension buffer-file-name))
               (setup-tide-mode)
               )))
-;; (add-hook 'web-mode-hook
-;;           (lambda ()
-;;             (when (string-equal "ts" (file-name-extension buffer-file-name))
-;;               (setup-tide-mode)
-;;               (flycheck-select-checker 'javascript-eslint)
-;;               )))
+(add-hook 'web-mode-hook
+          (lambda ()
+            (when (string-equal "ts" (file-name-extension buffer-file-name))
+              (setup-tide-mode)
+              (flycheck-select-checker 'javascript-eslint)
+              )))
 
 
 
-(add-hook 'rjsx-mode-hook 'hs-minor-mode)
-(add-hook 'rjsx-mode-hook 'emmet-mode)
+;;(add-hook 'rjsx-mode-hook 'hs-minor-mode)
+;;(add-hook 'rjsx-mode-hook 'emmet-mode)
+;;(add-hook 'rjsx-mode-hook 'git-gutter-mode)
 (add-hook 'web-mode-hook 'emmet-mode)
-(add-hook 'rjsx-mode-hook 'git-gutter-mode)
 (add-hook 'web-mode-hook 'git-gutter-mode)
 ;;(add-to-list 'load-path "~/.emacs.d/lisp/elpa-mirror")
 ;;(require 'elpa-mirror)
@@ -146,37 +147,49 @@
 (add-hook 'rjsx-mode-hook
           (lambda ()
             (setq emmet-expand-jsx-className? t) ;; default nil
-          ))
+            ))
 
 
-;; 微信小程序 tsx ----------------------------------------------------
 (defun my-web-mode ()
+  ;; (flycheck-select-checker 'javascript-eslint)
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 2)
   (setq emmet-expand-jsx-className? t)
   (setq web-mode-markup-indent-offset 2)
   (setq web-mode-css-indent-offset 2)
+  (setq web-mode-attr-indent-offset 2)
+  (setq web-mode-code-indent-offset 2)
   (setq web-mode-enable-auto-indentation nil)
   (setq web-mode-comment-style 2)
-  (flycheck-select-checker 'javascript-eslint)
   (setq web-mode-enable-current-element-highlight t)
-  (setq web-mode-code-indent-offset 2)
   (setq web-mode-enable-auto-quoting nil)
+  (setq web-mode-enable-literal-interpolation t)
+  ;;(set-fase-attribute 'web-mode-html-tag-unclosed-face nil :foreground "blue")
+  (set-face-attribute 'web-mode-interpolate-color1-face nil :foreground "white")
+  (set-face-attribute 'web-mode-interpolate-color2-face nil :foreground "orange")
+  (set-face-attribute 'web-mode-interpolate-color3-face nil :foreground "yellow")
+  (global-set-key (kbd "RET") 'newline)
+  (add-to-list 'web-mode-indentation-params '("lineup-args" . nil))
+  (add-to-list 'web-mode-indentation-params '("lineup-calls" . nil))
+  (add-to-list 'web-mode-indentation-params '("lineup-concats" . nil))
+  (add-to-list 'web-mode-indentation-params '("lineup-ternary" . nil))
   (setq-default web-mode-comment-formats
-              '(("java"       . "/*")
-                ("javascript" . "//")
-                ("typescript" . "//")
-                ("jsx" . "//")
-                ("tsx" . "//")
-                ("php"        . "/*")))
-)
+                '(("java"       . "/*")
+                  ("javascript" . "//")
+                  ("typescript" . "//")
+                  ("jsx" . "//")
+                  ("tsx" . "//")
+                  ("php"        . "/*")))
+  )
 (add-hook 'web-mode-hook 'my-web-mode)
 ;; end web-mode-hook ==============================
 
 
 ;; myts-mode-hook ----------------------------------------------------
-(defun myts-mode-hook ()
-  (setq-default typescript-indent-level 2)
-  (setq-default typescript-expr-indent-offset 2))
-(add-hook 'typescript-mode 'myts-mode-hook)
+;; (defun myts-mode-hook ()
+;;   (setq-default typescript-indent-level 2)
+;;   (setq-default typescript-expr-indent-offset 2))
+;;(add-hook 'typescript-mode 'myts-mode-hook)
 (setq-default typescript-indent-level 2)
 ;; end myts-mode-hook ================================
 
@@ -197,8 +210,8 @@
   :ensure t
   :config
   ;; automatically run the function when rjsx-mode starts
-  (eval-after-load 'rjsx-mode
-    '(add-hook 'rjsx-mode-hook 'add-node-modules-path))
+  ;; (eval-after-load 'rjsx-mode
+  ;;   '(add-hook 'rjsx-mode-hook 'add-node-modules-path))
   (eval-after-load 'web-mode
     '(add-hook 'web-mode-hook 'add-node-modules-path))
   )
@@ -209,13 +222,13 @@
   :ensure t
   :custom
   (flycheck-display-errors-delay 0)
-  (flycheck-check-syntax-automatically '(mode-enabled save new-line))
+  (flycheck-check-syntax-automatically '(save))
   :config
-  (global-flycheck-mode)
+  (flycheck-mode)
   ;; disable json-jsonlist checking for json files
   (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(json-jsonlist)))
   ;; disable jshint since we prefer eslint checking
-  (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(javascript-jshint)))
+  ;; (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(javascript-jshint)))
   ;; (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(typescript-tslint)))
   ;; use eslint with web-mode for jsx files
   (flycheck-add-mode 'javascript-eslint 'web-mode)
@@ -269,15 +282,15 @@
 ;; 中英文对齐 end
 
 ;;start 设置剪切板共享  GUI版本不需要 ------------------------------------
-;;(defun copy-from-osx ()
-;;(shell-command-to-string "pbpaste"))
-;;(defun paste-to-osx (text &optional push)
-;;(let ((process-connection-type nil))
-;;(let ((proc (start-process"pbcopy" "*Messages*" "pbcopy")))
-;;(process-send-string proc text)
-;;(process-send-eof proc))))
-;;(setq interprogram-cut-function 'paste-to-osx)
-;;(setq interprogram-paste-function 'copy-from-osx)
+;; (defun copy-from-osx ()
+;;   (shell-command-to-string "pbpaste"))
+;; (defun paste-to-osx (text &optional push)
+;;   (let ((process-connection-type nil))
+;;     (let ((proc (start-process"pbcopy" "*Messages*" "pbcopy")))
+;;       (process-send-string proc text)
+;;       (process-send-eof proc))))
+;; (setq interprogram-cut-function 'paste-to-osx)
+;; (setq interprogram-paste-function 'copy-from-osx)
 ;;end 设置剪切板共享 ====================================================
 
 ;; markdown 预览 ------------------------------------------
