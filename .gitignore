@@ -17,8 +17,6 @@ CVS
 cookies
 /newsticker
 \#*
-/elpa
-/elpa-*
 site-lisp/package/
 /swank
 /.mc-lists.el

@@ -1,5 +1,11 @@
+;;; Commentary
+
 ;;; init-preload-local.el --- 本地配置
 ;;; 安装资源路径
+(require 'package)
+(package-initialize)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
 (setq package-archives '(
                          ("melpa" . "https://elpa.emacs-china.org/melpa/")
                          ("gnu"   . "https://elpa.emacs-china.org/gnu/")
@@ -39,10 +45,11 @@
 (global-git-gutter-mode +1)
 (display-time-mode 1)
 
-(require 'package)
 
 ;; (add-to-list 'package-archives
 ;;              '("melpa" . "https://melpa.org/packages/") t)
+
+
 
 
 (require 'tide)
@@ -280,6 +287,12 @@
 
 (add-hook 'after-make-frame-functions 'emacs-daemon-after-make-frame-hook)
 ;; 中英文对齐 end
+
+;; 不喜欢的快捷键
+(global-unset-key (kbd "M-l")) ;; 转小写
+(global-unset-key (kbd "M-u")) ;; 转大写
+(global-unset-key (kbd "M-c")) ;; 转首字母大写
+;; 不喜欢的快捷键 end
 
 ;;start 设置剪切板共享  GUI版本不需要 ------------------------------------
 ;; (defun copy-from-osx ()
