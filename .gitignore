@@ -49,3 +49,5 @@ site-lisp/package/
 .cache/
 /forge-database.sqlite
 /transient
+/elpa
+/elpa-*

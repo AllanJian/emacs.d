@@ -4,11 +4,11 @@
 ;;; 安装资源路径
 (require 'package)
 (package-initialize)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-(add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+;;(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+;;(add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
 (setq package-archives '(
-                         ("melpa" . "https://elpa.emacs-china.org/melpa/")
                          ("gnu"   . "https://elpa.emacs-china.org/gnu/")
+                         ("melpa" . "https://elpa.emacs-china.org/melpa/")
                          ))
 ;;;;;;;;;;;;;;
 ;; cl - Common Lisp Extension
