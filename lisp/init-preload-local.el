@@ -61,7 +61,7 @@
 ;;;;;;;;;;;;;;;
 ;; (require 'js2-mode)
 ;; (require 'rjsx-mode)
-(add-to-list 'auto-mode-alist '("\\.html\\'" . html-mode))
+(add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.js\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.wxml\\'" . web-mode))
@@ -83,20 +83,32 @@
 ;; (add-to-list 'company-backends #'company-tabnine)
 ;; 自动补全插件 ends
 
-;; tide ;;;
+;; tide ;;; 原本自己写的
+;; (defun setup-tide-mode ()
+;;   (interactive)
+;;   (tide-setup)
+;;   (flycheck-mode +1)
+;;   (eldoc-mode +1)
+;;   (tide-hl-identifier-mode +1)
+;;   (setq tide-sync-request-timeout 5)
+;;   ;; company is an optional dependency. You have to
+;;   ;; install it separately via package-install
+;;   ;; `M-x package-install [ret] company`
+;;   (company-mode +1)
+;;   (setq company-backends
+;;         (remove 'company-css company-backends))  )
+
+;; ts
 (defun setup-tide-mode ()
   (interactive)
   (tide-setup)
   (flycheck-mode +1)
   (eldoc-mode +1)
   (tide-hl-identifier-mode +1)
-  (setq tide-sync-request-timeout 5)
   ;; company is an optional dependency. You have to
   ;; install it separately via package-install
   ;; `M-x package-install [ret] company`
-  (company-mode +1)
-  (setq company-backends
-        (remove 'company-css company-backends))  )
+  (company-mode +1))
 
 ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
@@ -104,7 +116,7 @@
 ;; formats the buffer before saving
 ;;(add-hook 'after-save-hook 'tide-format)
 
-(add-hook 'web-mode-hook #'setup-tide-mode)
+;;(add-hook 'web-mode-hook #'setup-tide-mode)
 ;;(add-hook 'rjsx-mode-hook #'setup-tide-mode)
 ;;(add-hook 'typescript-mode-hook #'setup-tide-mode)
 
@@ -169,11 +181,12 @@
   (setq web-mode-enable-auto-indentation nil)
   (setq web-mode-comment-style 2)
   (setq web-mode-enable-current-element-highlight t)
+  (setq web-mode-enable-current-column-highlight t)
   (setq web-mode-enable-auto-quoting nil)
   (setq web-mode-enable-literal-interpolation t)
   ;;(set-fase-attribute 'web-mode-html-tag-unclosed-face nil :foreground "blue")
   (set-face-attribute 'web-mode-interpolate-color1-face nil :foreground "white")
-  (set-face-attribute 'web-mode-interpolate-color2-face nil :foreground "orange")
+  (set-face-attribute 'web-mode-interpolate-color2-face nil  :foreground "orange")
   (set-face-attribute 'web-mode-interpolate-color3-face nil :foreground "yellow")
   (global-set-key (kbd "RET") 'newline)
   (add-to-list 'web-mode-indentation-params '("lineup-args" . nil))
@@ -239,6 +252,7 @@
   ;; (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(typescript-tslint)))
   ;; use eslint with web-mode for jsx files
   (flycheck-add-mode 'javascript-eslint 'web-mode)
+  ;; (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
   ;; Workaround for eslint loading slow
   ;; https://github.com/flycheck/flycheck/issues/1129#issuecomment-319600923
   (advice-add 'flycheck-eslint-config-exists-p :override (lambda() t)))
