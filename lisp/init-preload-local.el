@@ -1,9 +1,17 @@
 ;;; Commentary
+(condition-case nil
+    (require 'use-package)
+  (file-error
+   (require 'package)
+   (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+   (package-initialize)
+   (package-refresh-contents)
+   (package-install 'use-package)
+   (require 'use-package)))
 
 ;;; init-preload-local.el --- 本地配置
 ;;; 安装资源路径
 (require 'package)
-(package-initialize)
 ;;(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 ;;(add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
 (setq package-archives '(
@@ -53,7 +61,7 @@
 
 
 (require 'tide)
-(load-theme 'sanityinc-solarized-dark t)
+;;(load-theme 'sanityinc-solarized-dark t)
 (flycheck-add-next-checker 'tsx-tide 'javascript-eslint)
 ;;(flycheck-add-next-checker 'jsx-tide 'javascript-eslint 'append)
 
@@ -116,7 +124,7 @@
 ;; formats the buffer before saving
 ;;(add-hook 'after-save-hook 'tide-format)
 
-;;(add-hook 'web-mode-hook #'setup-tide-mode)
+(add-hook 'web-mode-hook #'setup-tide-mode)
 ;;(add-hook 'rjsx-mode-hook #'setup-tide-mode)
 ;;(add-hook 'typescript-mode-hook #'setup-tide-mode)
 
@@ -162,6 +170,12 @@
             (setq indent-tabs-mode nil)
             )
           )
+(add-hook 'scss-mode-hook
+          (lambda ()
+            (setq css-indent-offset 2)
+            (setq indent-tabs-mode nil)
+            )
+          )
 ;; react
 (add-hook 'rjsx-mode-hook
           (lambda ()
@@ -189,6 +203,8 @@
   (set-face-attribute 'web-mode-interpolate-color2-face nil  :foreground "orange")
   (set-face-attribute 'web-mode-interpolate-color3-face nil :foreground "yellow")
   (global-set-key (kbd "RET") 'newline)
+  (global-set-key (kbd "M-.") 'tide-jump-to-definition)
+  (global-set-key (kbd "M-,") 'tide-jump-back)
   (add-to-list 'web-mode-indentation-params '("lineup-args" . nil))
   (add-to-list 'web-mode-indentation-params '("lineup-calls" . nil))
   (add-to-list 'web-mode-indentation-params '("lineup-concats" . nil))
@@ -202,6 +218,8 @@
                   ("php"        . "/*")))
   )
 (add-hook 'web-mode-hook 'my-web-mode)
+(eval-after-load 'web-mode
+  '(add-hook 'web-mode-hook (lambda () (add-hook 'after-save-hook 'eslint-fix nil t))))
 ;; end web-mode-hook ==============================
 
 
@@ -336,6 +354,46 @@
 ;; end eshell 中文乱码 =================================================
 
 
+
+;; Install use-package
+
+;; (use-package lsp-mode :ensure t)
+(use-package lsp-mode
+  :config
+  (setq lsp-ui-doc-enable nil)
+  :commands lsp)
+(use-package lsp-dart
+  :ensure t
+  :hook (dart-mode . lsp)
+  :custom
+  (lsp-dart-suggest-from-unimported-libraries nil))
+
+;; Optional packages
+(use-package projectile :ensure t) ;; project management
+(use-package yasnippet
+  :ensure t
+  :config (yas-global-mode)) ;; snipets
+(use-package lsp-ui :ensure t) ;; UI for LSP
+
+
+;; Assuming usage with dart-mode
+;; (use-package dart-mode
+;;   ;; Optional
+;;   :hook (dart-mode . flutter-test-mode))
+
+(use-package flutter
+  :after dart-mode
+  :bind (:map dart-mode-map
+              ("C-M-x" . #'flutter-run-or-hot-reload))
+  :custom
+  (flutter-sdk-path "/Users/AllanJane/workspace/ljm/flutter/"))
+
+;; ;; Optional
+;; (use-package flutter-l10n-flycheck
+;;   :after flutter
+;;   :config
+;;   (flutter-l10n-flycheck-setup))
+
+
 (provide 'init-preload-local)
 ;;; init-preload-local.el ends here
-
