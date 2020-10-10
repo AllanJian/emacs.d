@@ -21,6 +21,7 @@
 ;;;;;;;;;;;;;;
 ;; cl - Common Lisp Extension
 (require 'cl)
+(require 'web-mode)
 
 ;; Add Packages
 (defvar my/packages '(
@@ -63,7 +64,7 @@
 (require 'tide)
 ;;(load-theme 'sanityinc-solarized-dark t)
 (flycheck-add-next-checker 'tsx-tide 'javascript-eslint)
-;;(flycheck-add-next-checker 'jsx-tide 'javascript-eslint 'append)
+(flycheck-add-next-checker 'typescript-tide 'javascript-eslint)
 
                                         ;rjsx-mode
 ;;;;;;;;;;;;;;;
@@ -75,8 +76,8 @@
 (add-to-list 'auto-mode-alist '("\\.wxml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.wxss\\'" . css-mode))
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.ts\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.json\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
 
 ;; rjsx缩进
 (defadvice js-jsx-indent-line (after js-jsx-indent-line-after-hack activate)
@@ -111,30 +112,55 @@
   (interactive)
   (tide-setup)
   (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save))
   (eldoc-mode +1)
   (tide-hl-identifier-mode +1)
   ;; company is an optional dependency. You have to
   ;; install it separately via package-install
   ;; `M-x package-install [ret] company`
   (company-mode +1))
-
+;; go 语言相关配置
+(require 'go-mode)
+(defun go-mode-setup ()
+  (setq compile-command "CONSUL_HTTP_HOST=10.227.21.68 SEC_MYSQL_AUTH=1 TCE_PSM=ad.pangle.site RUNTIME_IDC_NAME=boe doas -p ad.pangle.site output/bootstrap.sh")
+  (define-key (current-local-map) "\C-c\C-c" 'compile)
+  (go-eldoc-setup)
+  ;;Format before saving
+  (setq gofmt-command "goimports")
+  (add-hook 'before-save-hook 'gofmt-before-save)
+  (local-set-key (kbd "M-.") 'godef-jump))
+(add-hook 'go-mode-hook 'go-mode-setup)
 ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
+(add-hook 'go-mode-hook #'go-mode-setup)
+
+(defun protobuf-mod-setup ()
+  (display-line-numbers-mode)
+  (local-set-key (kbd "M-p") 'symbol-overlay-jump-prev)
+  (local-set-key (kbd "M-n") 'symbol-overlay-jump-next)  )
+(add-hook 'protobuf-mode-hook #'protobuf-mod-setup)
+
+(defconst my-protobuf-style
+  '((c-basic-offset . 4)
+
+    (indent-tabs-mode . nil)))
+
+(add-hook 'protobuf-mode-hook
+          (lambda () (c-add-style "my-style" my-protobuf-style t)))
+
+
+
 
 ;; formats the buffer before saving
-;;(add-hook 'after-save-hook 'tide-format)
+;; (add-hook 'after-save-hook 'tide-format)
+(add-hook 'typescript-mode-hook #'setup-tide-mode)
 
-(add-hook 'web-mode-hook #'setup-tide-mode)
-;;(add-hook 'rjsx-mode-hook #'setup-tide-mode)
-;;(add-hook 'typescript-mode-hook #'setup-tide-mode)
-
-(require 'web-mode)
 (add-hook 'web-mode-hook
           (lambda ()
             (when (string-equal "tsx" (file-name-extension buffer-file-name))
               (setup-tide-mode)
-              (flycheck-select-checker 'javascript-eslint)
-              ;;(flycheck-select-checker 'tsx-tide)
+              ;;(flycheck-select-checker 'javascript-eslint)
+              (flycheck-select-checker 'tsx-tide)
               )))
 (add-hook 'web-mode-hook
           (lambda ()
@@ -146,11 +172,11 @@
             (when (string-equal "js" (file-name-extension buffer-file-name))
               (setup-tide-mode)
               )))
-(add-hook 'web-mode-hook
+(add-hook 'typescript-mode-hook
           (lambda ()
             (when (string-equal "ts" (file-name-extension buffer-file-name))
               (setup-tide-mode)
-              (flycheck-select-checker 'javascript-eslint)
+              (flycheck-select-checker 'typescript-tide)
               )))
 
 
@@ -181,7 +207,6 @@
           (lambda ()
             (setq emmet-expand-jsx-className? t) ;; default nil
             ))
-
 
 (defun my-web-mode ()
   ;; (flycheck-select-checker 'javascript-eslint)
@@ -218,8 +243,14 @@
                   ("php"        . "/*")))
   )
 (add-hook 'web-mode-hook 'my-web-mode)
+(defun eslint-fix-and-check-again ()
+  (eslint-fix)
+  (flycheck-buffer))
+
 (eval-after-load 'web-mode
-  '(add-hook 'web-mode-hook (lambda () (add-hook 'after-save-hook 'eslint-fix nil t))))
+  '(add-hook 'web-mode-hook (lambda () (add-hook 'after-save-hook 'eslint-fix-and-check-again nil t))))
+(eval-after-load 'typescript-mode
+  '(add-hook 'typescript-mode-hook (lambda () (add-hook 'after-save-hook 'eslint-fix-and-check-again nil t))))
 ;; end web-mode-hook ==============================
 
 
@@ -393,7 +424,6 @@
 ;;   :after flutter
 ;;   :config
 ;;   (flutter-l10n-flycheck-setup))
-
 
 (provide 'init-preload-local)
 ;;; init-preload-local.el ends here
