@@ -63,8 +63,8 @@
 
 (require 'tide)
 ;;(load-theme 'sanityinc-solarized-dark t)
-(flycheck-add-next-checker 'tsx-tide 'javascript-eslint)
-(flycheck-add-next-checker 'typescript-tide 'javascript-eslint)
+;; (flycheck-add-next-checker 'tsx-tide 'javascript-eslint)
+;; (flycheck-add-next-checker 'typescript-tide 'javascript-eslint)
 
                                         ;rjsx-mode
 ;;;;;;;;;;;;;;;
@@ -77,7 +77,7 @@
 (add-to-list 'auto-mode-alist '("\\.wxss\\'" . css-mode))
 (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.json\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
+;; (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
 
 ;; rjsx缩进
 (defadvice js-jsx-indent-line (after js-jsx-indent-line-after-hack activate)
@@ -120,19 +120,19 @@
   ;; `M-x package-install [ret] company`
   (company-mode +1))
 ;; go 语言相关配置
-(require 'go-mode)
-(defun go-mode-setup ()
-  (setq compile-command "CONSUL_HTTP_HOST=10.227.21.68 SEC_MYSQL_AUTH=1 TCE_PSM=ad.pangle.site RUNTIME_IDC_NAME=boe doas -p ad.pangle.site output/bootstrap.sh")
-  (define-key (current-local-map) "\C-c\C-c" 'compile)
-  (go-eldoc-setup)
-  ;;Format before saving
-  (setq gofmt-command "goimports")
-  (add-hook 'before-save-hook 'gofmt-before-save)
-  (local-set-key (kbd "M-.") 'godef-jump))
-(add-hook 'go-mode-hook 'go-mode-setup)
+;;(require 'go-mode)
+;; (defun go-mode-setup ()
+;;   (setq compile-command "CONSUL_HTTP_HOST=10.227.21.68 SEC_MYSQL_AUTH=1 TCE_PSM=ad.pangle.site RUNTIME_IDC_NAME=boe doas -p ad.pangle.site output/bootstrap.sh")
+;;   (define-key (current-local-map) "\C-c\C-c" 'compile)
+;;   (go-eldoc-setup)
+;;   ;;Format before saving
+;;   (setq gofmt-command "goimports")
+;;   (add-hook 'before-save-hook 'gofmt-before-save)
+;;   (local-set-key (kbd "M-.") 'godef-jump))
+;; (add-hook 'go-mode-hook 'go-mode-setup)
 ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
-(add-hook 'go-mode-hook #'go-mode-setup)
+;; (add-hook 'go-mode-hook #'go-mode-setup)
 
 (defun protobuf-mod-setup ()
   (display-line-numbers-mode)
@@ -184,8 +184,7 @@
 ;;(add-hook 'rjsx-mode-hook 'hs-minor-mode)
 ;;(add-hook 'rjsx-mode-hook 'emmet-mode)
 ;;(add-hook 'rjsx-mode-hook 'git-gutter-mode)
-(add-hook 'web-mode-hook 'emmet-mode)
-(add-hook 'web-mode-hook 'git-gutter-mode)
+
 ;;(add-to-list 'load-path "~/.emacs.d/lisp/elpa-mirror")
 ;;(require 'elpa-mirror)
 ;;(setq package-archives '(("myelpa" . "~/myelpa/")))
@@ -218,15 +217,11 @@
   (setq web-mode-attr-indent-offset 2)
   (setq web-mode-code-indent-offset 2)
   (setq web-mode-enable-auto-indentation nil)
-  (setq web-mode-comment-style 2)
+  ;; (setq web-mode-comment-style 2)
   (setq web-mode-enable-current-element-highlight t)
   (setq web-mode-enable-current-column-highlight t)
   (setq web-mode-enable-auto-quoting nil)
   (setq web-mode-enable-literal-interpolation t)
-  ;;(set-fase-attribute 'web-mode-html-tag-unclosed-face nil :foreground "blue")
-  (set-face-attribute 'web-mode-interpolate-color1-face nil :foreground "white")
-  (set-face-attribute 'web-mode-interpolate-color2-face nil  :foreground "orange")
-  (set-face-attribute 'web-mode-interpolate-color3-face nil :foreground "yellow")
   (global-set-key (kbd "RET") 'newline)
   (global-set-key (kbd "M-.") 'tide-jump-to-definition)
   (global-set-key (kbd "M-,") 'tide-jump-back)
@@ -234,15 +229,20 @@
   (add-to-list 'web-mode-indentation-params '("lineup-calls" . nil))
   (add-to-list 'web-mode-indentation-params '("lineup-concats" . nil))
   (add-to-list 'web-mode-indentation-params '("lineup-ternary" . nil))
-  (setq-default web-mode-comment-formats
-                '(("java"       . "/*")
-                  ("javascript" . "//")
-                  ("typescript" . "//")
-                  ("jsx" . "//")
-                  ("tsx" . "//")
-                  ("php"        . "/*")))
+  ;; (setq-default web-mode-comment-formats
+  ;;               '(("java"       . "/*")
+  ;;                 ("javascript" . "//")
+  ;;                 ("typescript" . "//")
+  ;;                 ("jsx" . "//")
+  ;;                 ("tsx" . "//")
+  ;;                 ("php"        . "/*")))
   )
 (add-hook 'web-mode-hook 'my-web-mode)
+(add-hook 'web-mode-hook 'prettier-mode)
+(add-hook 'web-mode-hook 'emmet-mode)
+(add-hook 'web-mode-hook 'git-gutter-mode)
+(add-hook 'less-css-mode-hook 'prettier-mode)
+(add-hook 'typescript-mode-hook 'prettier-mode)
 (defun eslint-fix-and-check-again ()
   (eslint-fix)
   (flycheck-buffer))
@@ -316,7 +316,7 @@
 
 (defun create-frame-font-mac()          ;emacs 若直接启动 启动时调用此函数似乎无效
   (set-face-attribute
-   'default nil :font "Menlo 12")
+   'default nil :font "Menlo 14")
   ;; Chinese Font
   (dolist (charset '( han symbol cjk-misc bopomofo)) ;script 可以通过C-uC-x=查看当前光标下的字的信息
     (set-fontset-font (frame-parameter nil 'font)
